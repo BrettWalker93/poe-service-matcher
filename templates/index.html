@@ -7,7 +7,12 @@
     <h1>Available Services</h1>
     <ul>
         {% for service in services %}
-        <li>{{ service.name }}</li>
+        <li>
+            <strong>Service Name:</strong> {{ service.service }}<br>
+            <strong>Map Provided:</strong> {% if service.map_provided %}Yes{% else %}No{% endif %}<br>
+            <strong>Slots:</strong> {{ service.slots }}<br>
+            <strong>Price:</strong> {{ service.price }}
+        </li>
         {% endfor %}
     </ul>
 </body>

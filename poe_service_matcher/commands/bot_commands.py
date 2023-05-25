@@ -1,7 +1,7 @@
 import os
 import discord
 from discord.ext import commands
-from ..models import ServiceListing
+from ..models import User, ServiceListing
 from ...poe_service_matcher import db, app
 
 intents = discord.Intents.default()
@@ -15,6 +15,12 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+
+    new_user = User(user_id=str(message.author.id))
+    with app.app_context():
+        db.session.add(new_user)
+        db.session.commit()
+
     if message.content.startswith('$service'):
 
         def parse(m):
@@ -25,7 +31,7 @@ async def on_message(message):
             if len(mm) == 4 and m.author == message.author:
                 valid = True
 
-                new_service = ServiceListing(user_id=m.author.toString(), service=mm[0], map_provided=mm[1], slots=mm[2], price=mm[3])
+                new_service = ServiceListing(user_id=str(m.author.id), service=mm[0], map_provided=mm[1], slots=mm[2], price=mm[3])
                 with app.app_context():
                     db.session.add(new_service)
                     db.session.commit()
@@ -33,7 +39,7 @@ async def on_message(message):
             return valid
         
         try:
-            message.channel.send('service name, map provided (y/n), slots, price in chaos \n example: \'uber sirus, y, 1, 50\'' )
+            await message.channel.send('service name, map provided (y/n), slots, price in chaos \n example: \'uber sirus, y, 1, 50\'' )
             response = await bot.wait_for('message', check=parse, timeout=300)
             await message.channel.send(f'{response.content}')
         except asyncio.TimeoutError:

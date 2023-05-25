@@ -105,7 +105,7 @@ async def on_message(message):
         try:
             await message.channel.send('service name?')
             #print("Before bot.wait_for")
-            response = await bot.wait_for('message', check=parse_wrapper timeout=300)
+            response = await bot.wait_for('message', check=parse_wrapper, timeout=300)
             #print("After bot.wait_for")
             await message.channel.send(f'{response.content}')
         except asyncio.TimeoutError:

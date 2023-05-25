@@ -2,7 +2,8 @@ import os
 import discord
 from discord.ext import commands
 from ..models import User, ServiceListing
-from ...poe_service_matcher import db, app
+from ... import app
+from ..database import db
 
 intents = discord.Intents.default()
 intents.message_content = True

@@ -1,6 +1,6 @@
 
-from PoE_service_matcher import db, app
-from PoE_service_matcher.models import User, ServiceListing
+from poe_service_matcher import db, app
+from poe_service_matcher.models import User, ServiceListing
 
 with app.app_context():
     db.create_all()

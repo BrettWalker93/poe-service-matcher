@@ -37,7 +37,7 @@ async def on_message(message):
         def parse(m):
             valid = False
 
-            mm = m.content.split(',')
+            mm = [item.strip() for item in m.content.split(',')]
 
             if len(mm) == 4 and m.author == message.author:
                 valid = True

@@ -2,4 +2,3 @@ discord.py
 flask
 gunicorn
 flask_sqlalchemy
-discord.ext

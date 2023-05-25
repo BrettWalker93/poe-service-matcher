@@ -2,7 +2,7 @@ import os
 import discord
 from discord.ext import commands
 from ..models import User, ServiceListing
-from ... import app
+from poe_service_matcher import app
 from ..database import db
 
 intents = discord.Intents.default()

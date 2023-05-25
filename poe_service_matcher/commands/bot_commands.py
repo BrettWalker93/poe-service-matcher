@@ -28,8 +28,9 @@ async def on_message(message):
 
         if not user:
             new_user = User(username=str(message.author.id))
-            db.session.add(new_user)
-            db.session.commit()
+            with db.session.begin():
+                db.session.add(new_user)
+                db.session.commit()
 
         if message.content.startswith('$service'):
 
@@ -48,8 +49,9 @@ async def on_message(message):
                         slots=int(mm[2]),
                         price=int(mm[3])
                     )
-                    db.session.add(new_service)
-                    db.session.commit()
+                    with db.session.begin():
+                        db.session.add(new_service)
+                        db.session.commit()
 
                 return valid
         

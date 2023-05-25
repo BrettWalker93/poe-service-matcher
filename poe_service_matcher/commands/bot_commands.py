@@ -94,12 +94,13 @@ async def on_message(message):
                 service_info = []
                 for service in services:
                     username = f'<@{service.user_id}>'
-                    service_info.append((service.service, username, service.price))
+                    service_info.append((username, service.price))
 
                 table = tabulate(service_info, headers=["Service Name", "Provider", "Price"], tablefmt="pipe")
 
                 response_message = f"Services:\n\n{table}"
 
+                await message.channel.send(service.service)
                 await message.channel.send(response_message)
 
             return valid
@@ -109,7 +110,7 @@ async def on_message(message):
             #print("Before bot.wait_for")
             response = await bot.wait_for('message', check=parse_wrapper, timeout=300)
             #print("After bot.wait_for")
-            await message.channel.send(f'{response.content}')
+            #await message.channel.send(f'{response.content}')
         except asyncio.TimeoutError:
             await message.channel.send('poop de pewp de pantzes?')
 

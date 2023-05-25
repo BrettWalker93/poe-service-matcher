@@ -28,9 +28,8 @@ async def on_message(message):
 
         if not user:
             new_user = User(username=str(message.author.id))
-            with db.session.begin():
-                db.session.add(new_user)
-                db.session.commit()
+            db.session.add(new_user)
+            db.session.commit()
 
     if message.content.startswith('$service'):
 

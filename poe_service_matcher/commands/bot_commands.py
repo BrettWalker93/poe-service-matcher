@@ -20,41 +20,40 @@ async def on_message(message):
 
     print(f'received message: {message}')
 
-    user = User.query.filter_by(username=str(message.author.id)).first()
+    with app.app_context():
+        user = User.query.filter_by(username=str(message.author.id)).first()
 
-    if not user:
-        new_user = User(username=str(message.author.id))
-        with app.app_context():
+        if not user:
+            new_user = User(username=str(message.author.id))
             db.session.add(new_user)
             db.session.commit()
 
-    if message.content.startswith('$service'):
+        if message.content.startswith('$service'):
 
-        def parse(m):
-            valid = False
+            def parse(m):
+                valid = False
 
-            mm = m.content.split(',')
+                mm = m.content.split(',')
 
-            if len(mm) == 4 and m.author == message.author:
-                valid = True
+                if len(mm) == 4 and m.author == message.author:
+                    valid = True
 
-                new_service = ServiceListing(
-                    user_id=user.id,
-                    service=mm[0],
-                    map_provided=(True if mm[1] == 'y' else False),
-                    slots=int(mm[2]),
-                    price=int(mm[3])
-                )
-                with app.app_context():
+                    new_service = ServiceListing(
+                        user_id=user.id,
+                        service=mm[0],
+                        map_provided=(True if mm[1] == 'y' else False),
+                        slots=int(mm[2]),
+                        price=int(mm[3])
+                    )
                     db.session.add(new_service)
                     db.session.commit()
 
-            return valid
+                return valid
         
-        try:
-            await message.channel.send('service name, map provided (y/n), slots, price in chaos \n example: \'uber sirus, y, 1, 50\'' )
-            response = await bot.wait_for('message', check=parse, timeout=300)
-            await message.channel.send(f'{response.content}')
-        except asyncio.TimeoutError:
-            await message.channel.send('poop de pewp de pantzes')
+            try:
+                await message.channel.send('service name, map provided (y/n), slots, price in chaos \n example: \'uber sirus, y, 1, 50\'' )
+                response = await bot.wait_for('message', check=parse, timeout=300)
+                await message.channel.send(f'{response.content}')
+            except asyncio.TimeoutError:
+                await message.channel.send('poop de pewp de pantzes')
             

@@ -14,7 +14,7 @@ class User(db.Model):
 
 class ServiceListing(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)   
+    user_id = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)   
     service = db.Column(db.String(90), unique = False, nullable = False)
 
     map_provided = db.Column(db.Boolean, default=False, nullable = True)

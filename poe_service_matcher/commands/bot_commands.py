@@ -20,7 +20,7 @@ async def on_message(message):
 
     print(f'received message: {message}')
 
-    user = User.query.filter_by(user_id=str(message.author.id)).first()
+    user = User.query.filter_by(username=str(message.author.id)).first()
 
     if not user:
         new_user = User(username=str(message.author.id))

@@ -21,7 +21,7 @@ async def on_message(message):
         
         try:
             response = await bot.wait_for('message', check=parse, timeout=300)
-            await message.channel.send(f"{response.content}")
+            await message.channel.send(f'{response.content}')
         except asyncio.TimeoutError:
-            await message.channel.send("")
+            await message.channel.send('poop de pewp de pantzes')
             

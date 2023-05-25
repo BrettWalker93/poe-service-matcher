@@ -102,6 +102,8 @@ async def on_message(message):
 
                 await message.channel.send(service.service)
                 await message.channel.send(response_message)
+            else:
+                await message.channel.send('Service not currently listed.')
 
             return valid
 

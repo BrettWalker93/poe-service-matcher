@@ -65,10 +65,9 @@ async def on_message(message):
         except asyncio.TimeoutError:
             await message.channel.send('poop de pewp de pantzes')
 
-
     elif message.content.startswith('$request'):
 
-        def parse(m):
+        async def parse(m):
             valid = False
             
             service = None

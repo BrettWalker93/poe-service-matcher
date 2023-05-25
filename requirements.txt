@@ -3,3 +3,4 @@ flask
 gunicorn
 flask_sqlalchemy
 pymysql
+tabulate

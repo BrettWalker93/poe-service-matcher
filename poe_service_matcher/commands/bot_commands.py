@@ -1,10 +1,14 @@
 import os
+from this import s
 import discord
+import discord.utils
 from discord.ext import commands
 import asyncio
 from ..models import User, ServiceListing
 from poe_service_matcher import app
 from poe_service_matcher.database import db
+from datetime import datetime
+from tabulate import tabulate
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -60,4 +64,42 @@ async def on_message(message):
             await message.channel.send(f'{response.content}')
         except asyncio.TimeoutError:
             await message.channel.send('poop de pewp de pantzes')
+
+
+    elif message.content.startswith('$request'):
+
+        def parse(m):
+            valid = False
             
+            service = None
+
+            with app.app_context():
+                service = ServiceListing.query.filter_by(service=m.content).first()
+
+            if service is not None:
+                valid = True
+
+                services = None
+
+                with app.app_context():
+                    services = ServiceListing.query.filter_by(service=m.content).order_by(ServiceListing.time_listed).all()
+
+                service_info = []
+                for service in services:
+                    username = discord.utils.get(bot.get_all_members(), id=service.user_id).mention
+                    service_info.append((service.service, username, service.price))
+
+                table = tabulate(service_info, headers=["Service Name", "Provider", "Price"], tablefmt="pipe")
+
+                response_message = f"Services:\n\n{table}"
+
+                await message.channel.send(response_message)
+
+            return valid
+
+        try:
+            await message.channel.send('service name?')
+            response = await bot.wait_for('message', check=parse, timeout=300)
+            await message.channel.send(f'{response.content}')
+        except asyncio.TimeoutError:
+            await message.channel.send('poop de pewp de pantzes?')

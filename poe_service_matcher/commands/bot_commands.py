@@ -49,7 +49,7 @@ async def on_message(message):
 
                 with app.app_context():
                     new_service = ServiceListing(
-                        user_id=user.id,
+                        user_id=user.username,
                         service=mm[0],
                         map_provided=(True if mm[1] == 'y' else False),
                         slots=int(mm[2]),
@@ -112,3 +112,10 @@ async def on_message(message):
             await message.channel.send(f'{response.content}')
         except asyncio.TimeoutError:
             await message.channel.send('poop de pewp de pantzes?')
+
+    elif message.content.startswith('$clear'):
+
+        if user.username == '168865934675542016':
+            with app.app_context():
+                db.session.query(ServiceListing).delete()
+                db.session.commit()

@@ -1,2 +1,2 @@
-web: python poe_service_matcher.py
+web: gunicorn poe_service_matcher:app
 worker: python bot.py

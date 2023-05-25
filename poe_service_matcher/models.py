@@ -1,7 +1,7 @@
-from . import db
 from datetime import datetime
 from sqlalchemy import UniqueConstraint
 
+from .database import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)

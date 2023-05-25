@@ -1,13 +1,14 @@
-from flask import Flask
-from flask import render_template
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-db = SQLAlchemy(app)
 
+from .database import db
 from .models import User, ServiceListing
+
+db.init_app(app)
 
 @app.route('/')
 def index():

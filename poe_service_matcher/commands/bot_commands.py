@@ -98,7 +98,7 @@ async def on_message(message):
 
                 table = tabulate(service_info, headers=["Service Name", "Provider", "Price"], tablefmt="pipe")
 
-                response_message = f"Services:\n\n{table}"
+                response_message = f"Services:\n\n```\n{table}\n```"
 
                 await message.channel.send(service.service)
                 await message.channel.send(response_message)

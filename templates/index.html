@@ -9,6 +9,7 @@
         {% for service in services %}
         <li>
             <strong>Service Name:</strong> {{ service.service }}<br>
+            <strong>Provider:</strong> {{ service.user_id }}<br>
             <strong>Map Provided:</strong> {% if service.map_provided %}Yes{% else %}No{% endif %}<br>
             <strong>Slots:</strong> {{ service.slots }}<br>
             <strong>Price:</strong> {{ service.price }}

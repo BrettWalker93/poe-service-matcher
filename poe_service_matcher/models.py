@@ -25,7 +25,7 @@ class ServiceListing(db.Model):
 
     time_listed = db.Column(db.DateTime, default = datetime.utcnow)
 
-    __table_args__ = (db.UniqueConstraint('user_id', 'service', name='_user_service_uc'),)	
+    __table_args__ = (db.UniqueConstraint('user_id', 'service', name='_user_service_uc',deferrable = True, initially='DEFERRED'),)	
 
     def __repr__(self):
         return f'ServiceListing(user_id={self.user_id}, service={self.service})'

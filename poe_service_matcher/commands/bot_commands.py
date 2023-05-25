@@ -25,7 +25,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    print(f'received message: {message}')
+    print(f'received message: {message.content} from {message.author}')
 
     with app.app_context():
         user = User.query.filter_by(username=str(message.author.id)).first()
@@ -35,7 +35,7 @@ async def on_message(message):
             db.session.add(user)
             db.session.commit()
 
-        print(f'{user.username}')
+        #print(f'{user.username}')
 
     if message.content.startswith('$service'):
 

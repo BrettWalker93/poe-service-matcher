@@ -32,16 +32,17 @@ async def on_message(message):
                 db.session.add(new_user)
                 db.session.commit()
 
-        if message.content.startswith('$service'):
+    if message.content.startswith('$service'):
 
-            def parse(m):
-                valid = False
+        def parse(m):
+            valid = False
 
-                mm = m.content.split(',')
+            mm = m.content.split(',')
 
-                if len(mm) == 4 and m.author == message.author:
-                    valid = True
+            if len(mm) == 4 and m.author == message.author:
+                valid = True
 
+                with app.app_context():
                     new_service = ServiceListing(
                         user_id=user.id,
                         service=mm[0],
@@ -49,16 +50,15 @@ async def on_message(message):
                         slots=int(mm[2]),
                         price=int(mm[3])
                     )
-                    with db.session.begin():
-                        db.session.add(new_service)
-                        db.session.commit()
+                    db.session.add(new_service)
+                    db.session.commit()
 
-                return valid
+            return valid
         
-            try:
-                await message.channel.send('service name, map provided (y/n), slots, price in chaos \n example: \'uber sirus, y, 1, 50\'' )
-                response = await bot.wait_for('message', check=parse, timeout=300)
-                await message.channel.send(f'{response.content}')
-            except asyncio.TimeoutError:
-                await message.channel.send('poop de pewp de pantzes')
+        try:
+            await message.channel.send('service name, map provided (y/n), slots, price in chaos \n example: \'uber sirus, y, 1, 50\'' )
+            response = await bot.wait_for('message', check=parse, timeout=300)
+            await message.channel.send(f'{response.content}')
+        except asyncio.TimeoutError:
+            await message.channel.send('poop de pewp de pantzes')
             

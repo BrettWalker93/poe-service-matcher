@@ -4,7 +4,7 @@ from discord.ext import commands
 import asyncio
 from ..models import User, ServiceListing
 from poe_service_matcher import app
-from ..database import db
+from poe_service_matcher.database import db
 
 intents = discord.Intents.default()
 intents.message_content = True

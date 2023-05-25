@@ -19,7 +19,7 @@ async def on_message(message):
 
     print(f'received message: {message}')
 
-    new_user = User(user_id=str(message.author.id))
+    new_user = User(username=str(message.author.id))
     with app.app_context():
         db.session.add(new_user)
         db.session.commit()

@@ -96,9 +96,9 @@ async def on_message(message):
                     username = f'<@{service.user_id}>'
                     service_info.append((username, service.price))
 
-                table = tabulate(service_info, headers=["Provider", "Price"], tablefmt="simple")
+                service_lines = [f"{username} {price}" for username, price in service_info]
 
-                response_message = f"Services:\n\n{table}"
+                response_message = "\n".join(service_lines)
 
                 await message.channel.send(service.service)
                 await message.channel.send(response_message)

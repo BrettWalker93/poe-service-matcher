@@ -93,7 +93,7 @@ async def on_message(message):
 
                 service_info = []
                 for service in services:
-                    username = discord.utils.get(bot.get_all_members(), id=service.user_id).mention
+                    username = f'<@{service.user_id}>'
                     service_info.append((service.service, username, service.price))
 
                 table = tabulate(service_info, headers=["Service Name", "Provider", "Price"], tablefmt="pipe")

@@ -1,5 +1,6 @@
 from . import db
 from datetime import datetime
+from sqlalchemy import UniqueConstraint
 
 
 class User(db.Model):
@@ -9,11 +10,12 @@ class User(db.Model):
     services = db.relationship('ServiceListing', backref='user', lazy = True)
 
     def __repr__(self):
-        return 'User %r' % self.username
+        return f'ServiceListing(user_id={self.user_id}, service={self.service})'
 
 class ServiceListing(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, primary_key = True)   
-    service = db.Column(db.String(90), unique = False, nullable = False, primary_key = True)
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)   
+    service = db.Column(db.String(90), unique = False, nullable = False)
 
     map_provided = db.Column(db.Boolean, default=False, nullable = True)
     
@@ -22,5 +24,10 @@ class ServiceListing(db.Model):
     price = db.Column(db.Integer, unique = False, nullable = True)
 
     time_listed = db.Column(db.DateTime, default = datetime.utcnow)
+
+    __table_args__ = (db.UniqueConstraint('user_id', 'service', name='_user_service_uc'),)	
+
+    def __repr__(self):
+        return f'ServiceListing(user_id={self.user_id}, service={self.service})'
 
 

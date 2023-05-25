@@ -68,6 +68,9 @@ async def on_message(message):
     elif message.content.startswith('$request'):
 
         async def parse(m):
+
+            print(f'parsing: {m.content}')
+
             valid = False
             
             service = None

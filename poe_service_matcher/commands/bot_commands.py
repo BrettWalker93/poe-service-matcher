@@ -1,6 +1,7 @@
 import os
 import discord
 from discord.ext import commands
+import asyncio
 from ..models import User, ServiceListing
 from poe_service_matcher import app
 from ..database import db
@@ -19,10 +20,13 @@ async def on_message(message):
 
     print(f'received message: {message}')
 
-    new_user = User(username=str(message.author.id))
-    with app.app_context():
-        db.session.add(new_user)
-        db.session.commit()
+    user = User.query.filter_by(user_id=str(message.author.id)).first()
+
+    if not user:
+        new_user = User(username=str(message.author.id))
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
 
     if message.content.startswith('$service'):
 
@@ -34,7 +38,13 @@ async def on_message(message):
             if len(mm) == 4 and m.author == message.author:
                 valid = True
 
-                new_service = ServiceListing(user_id=str(m.author.id), service=mm[0], map_provided=mm[1], slots=mm[2], price=mm[3])
+                new_service = ServiceListing(
+                    user_id=user.id,
+                    service=mm[0],
+                    map_provided=(True if mm[1] == 'y' else False),
+                    slots=int(mm[2]),
+                    price=int(mm[3])
+                )
                 with app.app_context():
                     db.session.add(new_service)
                     db.session.commit()

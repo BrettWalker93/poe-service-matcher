@@ -9,11 +9,12 @@ from poe_service_matcher import db, app
 from sqlalchemy.orm import scoped_session, sessionmaker
 from ..services import database_services as dbs
 
+from ..session_context import create_session
+
 intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix = '$', intents = intents)
-
 
 @bot.event
 async def on_ready():
@@ -28,13 +29,10 @@ async def on_message(message):
         print(f'received message: {message.content} from {message.author}')
 
         user = None
-        with scoped_session(sessionmaker(bind=db.engine)) as session:
+        with create_session(db.engine) as session:
             user = dbs.get_user(str(message.author.id), session)
 
-            #print(f'{user.username}')
-
         if message.content.startswith('$service'):
-
             def parse(m):
                 valid = False
 
@@ -42,9 +40,8 @@ async def on_message(message):
 
                 if len(mm) == 4 and m.author == message.author:
                     valid = True
-                    with scoped_session(sessionmaker(bind=db.engine)) as session:
+                    with create_session(db.engine) as session:
                         dbs.list_service(mm, user, session)
-
                 return valid
         
             try:
@@ -60,9 +57,7 @@ async def on_message(message):
                 return asyncio.ensure_future(parse(m))
 
             async def parse(m):
-
-                #print(f'parsing: {m.content}')
-                with scoped_session(sessionmaker(bind=db.engine)) as session:
+                with create_session(db.engine) as session:
                     valid = dbs.service_exists(m.content, session)
 
                     if valid:
@@ -84,7 +79,6 @@ async def on_message(message):
                 await message.channel.send('poop de pewp de pantzes?')
 
         elif message.content.startswith('$clear'):
-
             if user.username == '168865934675542016':
-                with scoped_session(sessionmaker(bind=db.engine)) as session:
+                with create_session(db.engine) as session:
                     dbs.clear_listings(session)

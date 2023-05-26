@@ -51,22 +51,22 @@ async def on_message(message):
                 await message.channel.send('poop de pewp de pantzes')
 
         elif message.content.startswith('$request'):
-
             def parse_wrapper(m):
                 return asyncio.ensure_future(parse(m))
 
             async def parse(m):
-                with create_session(db.engine) as session:
-                    valid = dbs.service_exists(m.content, session)
+                with app.app_context():
+                    with create_session(db.engine) as session:
+                        valid = dbs.service_exists(m.content, session)
 
-                    if valid:
-                        response_message = dbs.parse_request(m.content, session)
-                        await message.channel.send(m.content)
-                        await message.channel.send(response_message)
-                    else:
-                        await message.channel.send('Service not currently listed.')
+                        if valid:
+                            response_message = dbs.parse_request(m.content, session)
+                            await message.channel.send(m.content)
+                            await message.channel.send(response_message)
+                        else:
+                            await message.channel.send('Service not currently listed.')
 
-                    return valid
+                        return valid
 
             try:
                 await message.channel.send('service name?')

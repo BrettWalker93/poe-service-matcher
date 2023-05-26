@@ -5,15 +5,21 @@ import discord.utils
 from discord.ext import commands
 import asyncio
 from ..models import User, ServiceListing
+from sqlalchemy.orm import scoped_session
+
 from poe_service_matcher import app
-from poe_service_matcher.database import db
+
 from datetime import datetime
 from tabulate import tabulate
+
+from .services import database_services as dbs
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix = '$', intents = intents)
+
+session = scoped_session(app.session_factory)
 
 @bot.event
 async def on_ready():
@@ -27,13 +33,7 @@ async def on_message(message):
 
     print(f'received message: {message.content} from {message.author}')
 
-    with app.app_context():
-        user = User.query.filter_by(username=str(message.author.id)).first()
-
-        if not user:
-            user = User(username=str(message.author.id))
-            db.session.add(user)
-            db.session.commit()
+    user = dbs.get_user(str(message.author.id))
 
         #print(f'{user.username}')
 
@@ -47,16 +47,7 @@ async def on_message(message):
             if len(mm) == 4 and m.author == message.author:
                 valid = True
 
-                with app.app_context():
-                    new_service = ServiceListing(
-                        user_id=user.username,
-                        service=mm[0],
-                        map_provided=(True if mm[1] == 'y' else False),
-                        slots=int(mm[2]),
-                        price=int(mm[3])
-                    )
-                    db.session.add(new_service)
-                    db.session.commit()
+                dbs.list_service(mm, user)
 
             return valid
         
@@ -76,31 +67,11 @@ async def on_message(message):
 
             #print(f'parsing: {m.content}')
 
-            valid = False
-            
-            service = None
+            valid = dbs.service_exists(m.content)
 
-            with app.app_context():
-                service = ServiceListing.query.filter_by(service=m.content).first()
-
-            if service is not None:
-                valid = True
-
-                services = None
-
-                with app.app_context():
-                    services = ServiceListing.query.filter_by(service=m.content).order_by(ServiceListing.time_listed).all()
-
-                service_info = []
-                for service in services:
-                    username = f'<@{service.user_id}>'
-                    service_info.append((username, service.price))
-
-                service_lines = [f"{username} {price}" for username, price in service_info]
-
-                response_message = "\n".join(service_lines)
-
-                await message.channel.send(service.service)
+            if valid:
+                response_message = dbs.parse_request(m.content)
+                await message.channel.send(m.content)
                 await message.channel.send(response_message)
             else:
                 await message.channel.send('Service not currently listed.')
@@ -119,6 +90,4 @@ async def on_message(message):
     elif message.content.startswith('$clear'):
 
         if user.username == '168865934675542016':
-            with app.app_context():
-                db.session.query(ServiceListing).delete()
-                db.session.commit()
+            dbs.clear_listings()

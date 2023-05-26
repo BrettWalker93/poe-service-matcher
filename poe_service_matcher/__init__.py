@@ -6,11 +6,11 @@ import os
 app = Flask(__name__, template_folder = '../templates')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
-from .database import db
-from .models import User, ServiceListing
+db = SQLAlchemy(app)
+Session = sessionmaker(bind=db.engine)
+session_factory = scoped_session(Session)
 
-db.init_app(app)
-session_factory = scoped_session(sessionmaker(bind=db.engine))
+from .models import User, ServiceListing
 
 @app.route('/')
 def index():

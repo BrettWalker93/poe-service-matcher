@@ -4,14 +4,9 @@ import discord
 import discord.utils
 from discord.ext import commands
 import asyncio
-from ..models import User, ServiceListing
-from sqlalchemy.orm import scoped_session
 
-from poe_service_matcher import app
-
-from datetime import datetime
-from tabulate import tabulate
-
+from poe_service_matcher import db, app
+from sqlalchemy.orm import scoped_session, sessionmaker
 from ..services import database_services as dbs
 
 intents = discord.Intents.default()
@@ -19,7 +14,6 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix = '$', intents = intents)
 
-session = scoped_session(app.session_factory)
 
 @bot.event
 async def on_ready():
@@ -33,7 +27,9 @@ async def on_message(message):
 
     print(f'received message: {message.content} from {message.author}')
 
-    user = dbs.get_user(str(message.author.id))
+    user = None
+    with scoped_session(sessionmaker(bind=db.engine)) as session:
+        user = dbs.get_user(str(message.author.id), session)
 
         #print(f'{user.username}')
 
@@ -46,8 +42,8 @@ async def on_message(message):
 
             if len(mm) == 4 and m.author == message.author:
                 valid = True
-
-                dbs.list_service(mm, user)
+                with scoped_session(sessionmaker(bind=db.engine)) as session:
+                    dbs.list_service(mm, user, session)
 
             return valid
         
@@ -66,17 +62,17 @@ async def on_message(message):
         async def parse(m):
 
             #print(f'parsing: {m.content}')
+            with scoped_session(sessionmaker(bind=db.engine)) as session:
+                valid = dbs.service_exists(m.content, session)
 
-            valid = dbs.service_exists(m.content)
+                if valid:
+                    response_message = dbs.parse_request(m.content, session)
+                    await message.channel.send(m.content)
+                    await message.channel.send(response_message)
+                else:
+                    await message.channel.send('Service not currently listed.')
 
-            if valid:
-                response_message = dbs.parse_request(m.content)
-                await message.channel.send(m.content)
-                await message.channel.send(response_message)
-            else:
-                await message.channel.send('Service not currently listed.')
-
-            return valid
+                return valid
 
         try:
             await message.channel.send('service name?')
@@ -90,4 +86,5 @@ async def on_message(message):
     elif message.content.startswith('$clear'):
 
         if user.username == '168865934675542016':
-            dbs.clear_listings()
+            with scoped_session(sessionmaker(bind=db.engine)) as session:
+                dbs.clear_listings(session)

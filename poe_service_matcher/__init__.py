@@ -9,11 +9,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 with app.app_context():
     Session = sessionmaker(bind=db.engine)
-session_factory = scoped_session(Session)
+    session_factory = scoped_session(Session)
 
 from .models import User, ServiceListing
 
 @app.route('/')
 def index():
-    services = ServiceListing.query.all()
+
+    session = session_factory()
+
+    services = session.query(ServiceListing).all()
+
+    session.close()
     return render_template('index.html', services=services)
+

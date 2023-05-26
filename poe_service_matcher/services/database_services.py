@@ -2,9 +2,7 @@ from ..models import User, ServiceListing
 from sqlalchemy.orm import scoped_session
 from poe_service_matcher import app
 
-session = scoped_session(app.session_factory)
-
-def get_user(id):
+def get_user(id, session):
     with app.app_context():
         user = session.query(User).filter_by(username=str(id)).first()
 
@@ -15,7 +13,7 @@ def get_user(id):
 
         return user
 
-def list_service(mm, user):
+def list_service(mm, user, session):
     with app.app_context():
         new_service = ServiceListing(
             user_id=user.username,
@@ -27,7 +25,7 @@ def list_service(mm, user):
         session.add(new_service)
         session.commit()
 
-def parse_request(m):
+def parse_request(m, session):
 
     services = None
 
@@ -42,18 +40,18 @@ def parse_request(m):
 
     return "Username, price, map provided: \n" + "\n".join(service_lines)
 
-def service_exists(m):
+def service_exists(m, session):
     service = None
 
     with app.app_context():
-        service = ServiceListing.query.filter_by(service=m).first()
+        service = session.query(ServiceListing).filter_by(service=m).first()
 
     if service is not None:
         return True
 
     return False
 
-def clear_listings():
+def clear_listings(session):
      with app.app_context():
         session.query(ServiceListing).delete()
         session.commit()

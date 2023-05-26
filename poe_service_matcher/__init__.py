@@ -7,7 +7,8 @@ app = Flask(__name__, template_folder = '../templates')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
 db = SQLAlchemy(app)
-Session = sessionmaker(bind=db.engine)
+with app.app_context():
+    Session = sessionmaker(bind=db.engine)
 session_factory = scoped_session(Session)
 
 from .models import User, ServiceListing

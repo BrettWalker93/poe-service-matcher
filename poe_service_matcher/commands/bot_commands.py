@@ -12,7 +12,7 @@ from poe_service_matcher import app
 from datetime import datetime
 from tabulate import tabulate
 
-from .services import database_services as dbs
+from ..services import database_services as dbs
 
 intents = discord.Intents.default()
 intents.message_content = True

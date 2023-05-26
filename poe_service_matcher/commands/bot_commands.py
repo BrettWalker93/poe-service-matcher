@@ -6,7 +6,6 @@ from discord.ext import commands
 import asyncio
 
 from poe_service_matcher import db, app
-from sqlalchemy.orm import scoped_session, sessionmaker
 from ..services import database_services as dbs
 
 from ..session_context import create_session
